@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <center>
+        <div class="ownstyle">
+            <h3>
+                Создание нового кошелька
+            </h3>
+            <hr>
+            {{ form.hidden_tag() }}
+            {{ wtf.quick_form(form)}}
+            {% for error in form.summ.errors %}
+            <p style="color: red;">[{{ error }}]</p>
+            {% endfor %}
+            {% with messages=get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <span style="color: red"> {{ message }} </span>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+    </center>
+{% endblock %}

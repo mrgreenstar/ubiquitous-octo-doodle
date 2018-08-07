@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    {% if not current_user.is_anonymous %}
+    <div align="center">
+        {% if Flag %}
+            <h3>
+                Список счетов:
+            </h3>
+            <hr>
+            {% for info in bills %}
+                <h4> Счёт № {{ info.billfold_number }}:
+                    <p>Баланс: {{ info.balance }} {{ info.wallet }}</p>
+                </h4>
+                <hr>
+            {% endfor %}
+        {% else %}
+            <h2>
+                У вас еще нет счетов.
+            </h2>
+        {% endif %}
+    </div>
+    {% endif %}
+{% endblock %}

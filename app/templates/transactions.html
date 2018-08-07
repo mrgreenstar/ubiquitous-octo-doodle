@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    table {
+        table-layout: fixed;
+        width: 95%;
+        border: 1;
+    }
+    td {
+        padding: 2px;
+        padding-right: 2px;
+        word-wrap: break-word;
+    }
+</style>
+<center>
+    {% if sended %}
+    <h4>Отправленные переводы:</h4>
+    <table border="1" cellpadding="7">
+        <td>
+            Время:
+        </td>
+        <td>
+            Счет отправителя:
+        </td>
+        <td>
+            Счет получателя:
+        </td>
+        <td>
+            Сумма перевода:
+        </td>
+        <td>
+            Сообщение отправителя:
+        </td>
+        {% for transfer in sended %}
+        <tr>
+            <td>
+                {{ moment(transfer[0].date).format('LLL') }}
+            </td>
+            <td>
+                {{ transfer[0].senderBill }}
+            </td>
+            <td>
+                {{ transfer[0].receiverBill }}
+            </td>
+            <td>
+                {{ transfer[0].transferAmount }}
+                {{ transfer[1] }}
+            </td>
+            <td>
+                {% if transfer[0].message %}
+                    {{ transfer[0].message }}
+                {% else %}
+                    <b>Отправитель не оставил сообщения</b>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <h4>Вы еще не совершали переводов</h4>
+    {% endif %}
+
+    {% if received %}
+    <h4>Полученные переводы:</h4>
+    <table border="1" cellpadding="7">
+        <td>
+            Время:
+        </td>
+        <td>
+            Счет отправителя:
+        </td>
+        <td>
+            Счет получателя:
+        </td>
+        <td>
+            Сумма перевода:
+        </td>
+        <td>
+            Сообщение отправителя:
+        </td>
+        {% for transfer in received %}
+        <tr>
+            <td>
+                {{ moment(transfer[0].date).format('LLL') }}
+            </td>
+            <td>
+                {{transfer[0].senderBill}}
+            </td>
+            <td>
+                {{ transfer[0].receiverBill }}
+            </td>
+            <td>
+                {{ transfer[0].transferAmount }}
+                {{ transfer[1] }}
+            </td>
+            <td>
+                {% if transfer[0].message %}
+                    {{ transfer[0].message }}
+                {% else %}
+                    <b>Отправитель не оставил сообщения</b>
+                {% endif %}
+
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <h4>Вы еще не получали переводов</h4>
+    {% endif %}
+</center>
+{% endblock %}

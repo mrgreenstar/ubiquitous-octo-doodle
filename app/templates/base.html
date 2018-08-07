@@ -1,0 +1,71 @@
+{% extends "bootstrap/base.html" %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang('ru') }}
+{% endblock %}
+
+{% block styles %}
+{{super()}}    
+    <link rel="stylesheet" href="{{url_for('.static', filename='somestyles.css')}}">
+{% endblock %}
+
+{% block title %} Кошельки {% endblock %}
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+            data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!--<a class="navbar-brand" href="{{ url_for('main') }}">Главная страница</a> -->
+        </div>
+        <div class="navbar-collapse collapse">
+            <u1 class="nav navbar-nav">
+                {% if current_user.is_anonymous %}
+                <li>
+                    <a href="{{ url_for('registration') }}">Регистрация</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('login') }}">Войти</a>
+                </li>
+                {% elif not current_user.is_anonymous %}
+                <li>
+                    <a href="{{ url_for('main') }}">Кошельки</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('transactions') }}">История переводов</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('transfer') }}">Перевести деньги</a>
+                </li>                
+                <li>
+                    <a href="{{url_for('upBill')}}">Пополнить счет</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('newBill') }}">Создать счет</a>
+                </li>
+                {% endif %}
+            </u1>
+            <u1 class="nav navbar-nav navbar-right">
+                {% if not current_user.is_anonymous %}
+                <li>
+                    <a>{{ current_user.name }} {{ current_user.surname }}</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}">Выйти</a>
+                </li>
+                {% endif %}
+            </u1>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}

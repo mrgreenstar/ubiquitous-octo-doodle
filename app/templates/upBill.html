@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<center>
+    <div class="ownstyle">
+        {% if Flag %}
+            <h3>
+                Пополнение счета.
+            </h3>
+            <h5>
+                Выберите счет, который хотите пополнить.
+            </h5>
+            <hr>
+            {{wtf.quick_form(form)}}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <span style="color: red"> {{ message }} </span>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        {% else %}
+            <h2>
+                У вас еще нет счетов.
+                <a href="{{url_for('newBill')}}">Создать счёт?</a>
+            </h2>
+        {% endif %}
+    </div>
+</center>
+{% endblock %}

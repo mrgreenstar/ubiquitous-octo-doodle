@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<center>
+    <div class="page-header">
+        <h1>Войти</h1>
+    </div>
+    <div class="ownstyle">
+        {{wtf.quick_form(form)}}
+    {% with messages=get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: red"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    </div>
+</center>
+{% endblock %}
