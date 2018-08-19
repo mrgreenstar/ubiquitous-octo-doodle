@@ -21,8 +21,8 @@ def generate_keys():
         Возвращает 2 словаря.
     '''
 
-    lowerBound = 2**1024
-    upperBound = 2**2048
+    lowerBound = 2**100
+    upperBound = 2**150
     Flag = 1
     d = 1
 
@@ -43,7 +43,7 @@ def generate_keys():
 
     # Создаем открытую e экспоненту
     eiler = (p - 1) * (q - 1)
-    e = prime_number(2**512, 2**1000)
+    e = prime_number(2**15, 2**30)
     while e > eiler:
         e = prime_number()
 
@@ -179,3 +179,6 @@ def salt(message):
         message.append(darker_char)
 
     return darker_char, dimmer
+
+def oneside_func(x, e, m):
+    return int(gmpy2.powmod(x, e, m))

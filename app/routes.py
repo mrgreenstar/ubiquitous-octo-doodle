@@ -1,6 +1,9 @@
 import sys
+import gmpy2
 import datetime
+import random
 from app.rsaC.rsaDM import generate_keys, encrypt_message, decrypt_message, generate_public, base_decode
+from app.rsaC.rsaDM import oneside_func
 from flask import render_template, flash, redirect, url_for, request
 from sqlalchemy import and_
 from flask_login import current_user, login_user, logout_user, login_required
@@ -141,42 +144,53 @@ def transfer():
                 # Информация для отладки
                 #print("Сумма перевода: {}\n".format(newTransaction.transferAmount))
                 #print("Валюты на счетах отправителя и получателя: {} и {}".format(
-                    sender.wallet, receiver.wallet))
-                # Конец информации
-
-                user_balance = Billfold.query.filter(Billfold.user_id == current_user.id,\
-                            Billfold.billfold_number == newTransaction.senderBill).first()
-                user_balance.balance = user_balance.balance - newTransaction.transferAmount
-
-                receiver_balace = Billfold.query.filter(Billfold.user_id\
-                        == newTransaction.receiverId, Billfold.billfold_number ==\
-                        newTransaction.receiverBill).first()
-                receiver_balace.balance = receiver_balace.balance + newTransaction.transferAmount
-                db.session.commit()
-
-                decrypted_message = str(form.message.data)
-
+                #    sender.wallet, receiver.wallet))
                 private_key = CryptoInfo.query.filter(CryptoInfo.user_id == newTransaction.receiverId).first()
-                newKey = CryptoInfo()
-                if private_key:
-                    private_key = base_decode(private_key)
-                    public_key=generate_public(private_key)
-                else:
-                    private_key, public_key = generate_keys()
-                    newKey.key = str(private_key['priv_exp']) + '|' + str(
-                        private_key['modulus']) + '|' + str(
-                        private_key['p']) + '|' + str(private_key['q'])
-                    newKey.user_id = int(newTransaction.receiverId)
-                    db.session.add(newKey)
-                newTransaction.transferAmount = encrypt_message(
-                    str(newTransaction.transferAmount), public_key)
-                encrypted_message = encrypt_message(decrypted_message, public_key)
-                newTransaction.message = encrypted_message
-                newTransaction.date = str(datetime.datetime.utcnow())[:19]
-                newTransaction.date = encrypt_message(newTransaction.date, public_key)
-                db.session.add(newTransaction)
-                db.session.commit()
-                return redirect(url_for('main'))
+                private_key = base_decode(private_key)
+                public_key=generate_public(private_key)
+                # TEST
+                darkening_factor = random.randint(2, 30)
+                m = public_key['modulus']
+                e = public_key['publ_exp']
+                d = private_key['priv_exp']
+                r_pow_e = gmpy2.mpz(darkening_factor) ** e
+                fx = oneside_func(int(newTransaction.transferAmount), int(e), int(m))
+                bank_sign = gmpy2.powmod(int(fx), int(d), int(m))
+                if (fx == gmpy2.powmod(int(fx), 1, int(m))):
+                    user_balance = Billfold.query.filter(Billfold.user_id == current_user.id,\
+                                Billfold.billfold_number == newTransaction.senderBill).first()
+                    user_balance.balance = user_balance.balance - newTransaction.transferAmount
+
+                    receiver_balace = Billfold.query.filter(Billfold.user_id\
+                            == newTransaction.receiverId, Billfold.billfold_number ==\
+                            newTransaction.receiverBill).first()
+                    receiver_balace.balance = receiver_balace.balance + newTransaction.transferAmount
+                    db.session.commit()
+
+                    decrypted_message = str(form.message.data)
+
+                    private_key = CryptoInfo.query.filter(CryptoInfo.user_id == newTransaction.receiverId).first()
+                    newKey = CryptoInfo()
+                    if private_key:
+                        private_key = base_decode(private_key)
+                        public_key=generate_public(private_key)
+                    else:
+                        private_key, public_key = generate_keys()
+                        newKey.key = str(private_key['priv_exp']) + '|' + str(
+                            private_key['modulus']) + '|' + str(
+                            private_key['p']) + '|' + str(private_key['q'])
+                        newKey.user_id = int(newTransaction.receiverId)
+                        db.session.add(newKey)
+                    
+                    newTransaction.transferAmount = encrypt_message(
+                        str(newTransaction.transferAmount), public_key)
+                    encrypted_message = encrypt_message(decrypted_message, public_key)
+                    newTransaction.message = encrypted_message
+                    newTransaction.date = str(datetime.datetime.utcnow())[:19]
+                    newTransaction.date = encrypt_message(newTransaction.date, public_key)
+                    db.session.add(newTransaction)
+                    db.session.commit()
+                    return redirect(url_for('main'))
     return render_template('transfer.html', form=form)
 
 @app.route('/transactions')
